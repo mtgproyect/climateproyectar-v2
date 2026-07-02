@@ -3,152 +3,224 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="theme-color" content="#071a33">
-  <meta name="description" content="Pronóstico y observaciones meteorológicas para 10.601 localidades de Argentina, con datos oficiales del SMN.">
-  <title>Clima Argentina V2</title>
-  <link rel="stylesheet" href="./assets/css/styles.css">
-  <script defer src="./assets/js/date-utils.js"></script>
-  <script defer src="./assets/js/app.js"></script>
+  <meta name="theme-color" content="#081d33">
+  <meta name="description" content="Clima, pronóstico, alertas, radares y satélite para 10.601 localidades de la Argentina.">
+  <title>ClimateProyectar</title>
+  <link rel="preconnect" href="https://raw.githubusercontent.com" crossorigin>
+  <link rel="preconnect" href="https://estaticos.smn.gob.ar" crossorigin>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIINfQ3ynvY5teQspI3Qerj9Q2Zsc3Qe7mM=" crossorigin="">
+  <link rel="stylesheet" href="./assets/css/styles.css?v=2.0.0">
 </head>
 <body>
-  <a class="skip-link" href="#contenido">Saltar al contenido</a>
+  <a class="skip-link" href="#main-content">Saltar al contenido</a>
 
   <header class="site-header">
-    <div class="header-inner">
-      <a class="brand" href="./" aria-label="Ir al inicio">
-        <span class="brand-mark" aria-hidden="true">☀</span>
+    <div class="container header-inner">
+      <a class="brand" href="./" aria-label="ClimateProyectar, inicio">
+        <span class="brand-mark" aria-hidden="true">CP</span>
         <span>
-          <strong>Clima Argentina</strong>
-          <small>Versión 2</small>
+          <strong>ClimateProyectar</strong>
+          <small>Información meteorológica argentina</small>
         </span>
       </a>
       <div class="header-meta">
-        <span class="data-pill"><span class="status-dot"></span> Datos SMN</span>
-        <button class="icon-button" id="share-button" type="button" hidden aria-label="Compartir esta localidad">Compartir</button>
+        <span id="locality-count">Cargando localidades…</span>
+        <span class="official-pill">Datos oficiales SMN</span>
       </div>
     </div>
   </header>
 
-  <main id="contenido">
-    <section class="hero" aria-labelledby="hero-title">
-      <div class="hero-glow hero-glow-one"></div>
-      <div class="hero-glow hero-glow-two"></div>
-      <div class="hero-inner">
-        <p class="eyebrow">Cobertura nacional</p>
-        <h1 id="hero-title">El tiempo en <span id="locality-count">10.601</span> localidades</h1>
-        <p class="hero-copy">Buscá por localidad, departamento o provincia. Los pronósticos y las observaciones se publican sin modificar los datos oficiales.</p>
+  <main id="main-content">
+    <section class="hero">
+      <div class="container hero-grid">
+        <div>
+          <p class="eyebrow">Argentina · cobertura nacional</p>
+          <h1>El clima de tu localidad, en un solo lugar</h1>
+          <p class="hero-copy">Condiciones actuales, pronóstico extendido, alertas oficiales, radar y satélite.</p>
+        </div>
 
-        <div class="search-panel">
-          <label for="search-input">¿Qué localidad querés consultar?</label>
+        <div class="search-card">
+          <label for="search-input">Buscar localidad</label>
           <div class="search-row">
-            <div class="search-box">
+            <div class="search-wrap">
               <span class="search-icon" aria-hidden="true">⌕</span>
-              <input id="search-input" type="search" autocomplete="off" placeholder="Ej.: Córdoba, Ushuaia, San Rafael…" aria-autocomplete="list" aria-controls="suggestions" aria-expanded="false">
-              <button id="clear-search" class="clear-button" type="button" aria-label="Limpiar búsqueda" hidden>×</button>
+              <input id="search-input" type="search" autocomplete="off" spellcheck="false"
+                placeholder="Ej.: Córdoba, CABA, Ushuaia…" aria-autocomplete="list"
+                aria-controls="suggestions" aria-expanded="false">
+              <button id="clear-search" class="icon-button" type="button" hidden aria-label="Limpiar búsqueda">×</button>
               <div id="suggestions" class="suggestions" role="listbox" hidden></div>
             </div>
-            <button id="location-button" class="secondary-button" type="button">
-              <span aria-hidden="true">◎</span>
-              Usar mi ubicación
-            </button>
+            <button id="location-button" class="button secondary" type="button">Usar mi ubicación</button>
           </div>
-          <p id="search-status" class="search-status" role="status" aria-live="polite">Cargando catálogo de localidades…</p>
+          <p id="search-status" class="search-status" aria-live="polite">Preparando el catálogo nacional…</p>
           <div id="recent-searches" class="recent-searches" hidden>
             <span>Recientes</span>
-            <div id="recent-list" class="chip-list"></div>
+            <div id="recent-list" class="chip-row"></div>
           </div>
         </div>
       </div>
     </section>
 
-    <section id="result-section" class="result-shell" hidden aria-live="polite">
-      <div id="alert-container"></div>
-
-      <div class="location-heading">
-        <div>
-          <p id="location-kicker" class="eyebrow">Localidad seleccionada</p>
-          <h2 id="location-title">—</h2>
-          <p id="location-subtitle" class="location-subtitle">—</p>
-        </div>
-        <div class="publication-stamp">
-          <span>Datos publicados</span>
-          <strong id="publication-date">—</strong>
-        </div>
+    <section class="source-strip" aria-label="Estado de las fuentes">
+      <div class="container source-grid" id="source-grid">
+        <article class="source-card" data-source="observations"><span>Observaciones</span><strong>Cargando…</strong></article>
+        <article class="source-card" data-source="forecasts"><span>Pronósticos</span><strong>Cargando…</strong></article>
+        <article class="source-card" data-source="alerts"><span>Alertas</span><strong>Cargando…</strong></article>
+        <article class="source-card" data-source="radar"><span>Radar</span><strong>Cargando…</strong></article>
+        <article class="source-card" data-source="satellite"><span>Satélite</span><strong>Cargando…</strong></article>
       </div>
+    </section>
 
-      <section class="current-grid" aria-labelledby="current-title">
-        <article class="current-card primary-card">
-          <div class="card-heading">
-            <div>
-              <p class="section-label">Observación más reciente</p>
-              <h3 id="current-title">Condiciones actuales</h3>
-            </div>
-            <span id="observation-badge" class="freshness-badge">—</span>
-          </div>
-          <div class="current-main">
-            <div id="current-glyph" class="weather-glyph" aria-hidden="true">—</div>
-            <div>
-              <div class="temperature-line"><span id="current-temperature">—</span><small>°C</small></div>
-              <p id="current-description" class="weather-description">—</p>
-              <p id="feels-like" class="muted-text"></p>
-            </div>
-          </div>
-          <p id="station-source" class="source-line">—</p>
-        </article>
-
-        <article class="metrics-card">
-          <h3>Detalles de la observación</h3>
-          <div class="metrics-grid">
-            <div class="metric"><span>Humedad</span><strong id="metric-humidity">—</strong></div>
-            <div class="metric"><span>Viento</span><strong id="metric-wind">—</strong></div>
-            <div class="metric"><span>Presión</span><strong id="metric-pressure">—</strong></div>
-            <div class="metric"><span>Visibilidad</span><strong id="metric-visibility">—</strong></div>
-          </div>
-          <p id="observation-time" class="timestamp">—</p>
-        </article>
+    <div class="container content-wrap">
+      <section id="empty-state" class="empty-state">
+        <div class="empty-icon" aria-hidden="true">⌖</div>
+        <h2>Elegí una localidad</h2>
+        <p>Podés buscar entre 10.601 localidades o usar tu ubicación para encontrar la más cercana.</p>
       </section>
 
-      <section class="forecast-section" aria-labelledby="forecast-title">
-        <div class="section-heading">
+      <section id="error-state" class="error-state" hidden>
+        <h2>No pudimos preparar la aplicación</h2>
+        <p id="error-message"></p>
+        <button id="retry-button" class="button" type="button">Reintentar</button>
+      </section>
+
+      <section id="result-section" class="result-section" hidden>
+        <div class="location-heading">
           <div>
-            <p class="section-label">Pronóstico oficial</p>
-            <h2 id="forecast-title">Próximos días</h2>
+            <p class="eyebrow">Localidad seleccionada</p>
+            <h2 id="location-title">—</h2>
+            <p id="location-subtitle">—</p>
           </div>
-          <p id="forecast-updated" class="timestamp">—</p>
+          <button id="share-button" class="button secondary compact" type="button">Compartir</button>
         </div>
-        <div id="forecast-grid" class="forecast-grid"></div>
-      </section>
 
-      <section class="method-note">
-        <div class="method-icon" aria-hidden="true">i</div>
-        <div>
-          <h3>Cómo interpretar estos datos</h3>
-          <p>La observación corresponde a la estación meteorológica operativa asociada a la localidad. El pronóstico puede estar compartido entre localidades cercanas. Cuando el SMN no publica un pronóstico actual para una base antártica, se muestra el último pronóstico oficial disponible con su fecha original y una advertencia visible.</p>
+        <nav class="tabs" aria-label="Secciones meteorológicas">
+          <button class="tab active" type="button" data-tab="summary" aria-selected="true">Resumen</button>
+          <button class="tab" type="button" data-tab="forecast" aria-selected="false">Pronóstico</button>
+          <button class="tab" type="button" data-tab="alerts" aria-selected="false">Alertas <span id="alerts-tab-badge" class="tab-badge" hidden></span></button>
+          <button class="tab" type="button" data-tab="radar" aria-selected="false">Radar</button>
+          <button class="tab" type="button" data-tab="satellite" aria-selected="false">Satélite</button>
+        </nav>
+
+        <div id="tab-summary" class="tab-panel active">
+          <div id="summary-alert-banner"></div>
+          <div class="summary-grid">
+            <article class="current-card card">
+              <div class="current-main">
+                <span id="current-glyph" class="weather-glyph" aria-hidden="true">◌</span>
+                <div>
+                  <div class="temperature"><span id="current-temperature">—</span><small>°C</small></div>
+                  <p id="current-description">Cargando observación…</p>
+                  <p id="feels-like" class="muted"></p>
+                </div>
+              </div>
+              <div class="current-meta">
+                <span id="observation-badge" class="status-badge">Cargando</span>
+                <p id="station-source">—</p>
+                <p id="observation-time" class="muted">—</p>
+              </div>
+            </article>
+
+            <div class="metrics-grid">
+              <article class="metric-card"><span>Humedad</span><strong id="metric-humidity">—</strong></article>
+              <article class="metric-card"><span>Viento</span><strong id="metric-wind">—</strong></article>
+              <article class="metric-card"><span>Presión</span><strong id="metric-pressure">—</strong></article>
+              <article class="metric-card"><span>Visibilidad</span><strong id="metric-visibility">—</strong></article>
+            </div>
+          </div>
+
+          <article class="card summary-forecast">
+            <div class="section-heading">
+              <div><p class="eyebrow">Próximos días</p><h3>Pronóstico resumido</h3></div>
+              <button class="text-button" type="button" data-open-tab="forecast">Ver pronóstico completo →</button>
+            </div>
+            <div id="summary-forecast-grid" class="mini-forecast-grid"><p class="loading-text">Cargando pronóstico…</p></div>
+          </article>
+        </div>
+
+        <div id="tab-forecast" class="tab-panel" hidden>
+          <div class="section-heading">
+            <div><p class="eyebrow">Hasta siete días</p><h3>Pronóstico extendido</h3></div>
+            <p id="forecast-updated" class="muted">—</p>
+          </div>
+          <div id="forecast-notice"></div>
+          <div id="forecast-grid" class="forecast-grid"><p class="loading-text">Seleccioná una localidad.</p></div>
+        </div>
+
+        <div id="tab-alerts" class="tab-panel" hidden>
+          <div class="section-heading alerts-heading">
+            <div><p class="eyebrow">Sistema de Alerta Temprana</p><h3>Alertas meteorológicas</h3></div>
+            <div class="filter-row">
+              <label>Fecha <select id="alert-date-filter"><option value="">Todas</option></select></label>
+              <label>Fenómeno <select id="alert-event-filter"><option value="">Todos</option></select></label>
+            </div>
+          </div>
+          <div id="locality-alerts" class="locality-alerts"><p class="loading-text">Cargando alertas de la localidad…</p></div>
+          <div class="alert-layout">
+            <article class="card map-card">
+              <div id="alert-map" class="alert-map" aria-label="Mapa nacional de alertas"></div>
+              <p id="map-status" class="muted map-status">El mapa se cargará al abrir esta sección.</p>
+            </article>
+            <article class="card alerts-list-card">
+              <h4>Alertas activas</h4>
+              <div id="alerts-list" class="alerts-list"><p class="loading-text">Cargando…</p></div>
+            </article>
+          </div>
+        </div>
+
+        <div id="tab-radar" class="tab-panel" hidden>
+          <div class="section-heading">
+            <div><p class="eyebrow">Imágenes oficiales</p><h3>Radar meteorológico</h3></div>
+            <label class="product-selector">Producto
+              <select id="radar-product"><option>Cargando productos…</option></select>
+            </label>
+          </div>
+          <article class="viewer-card card">
+            <div class="viewer-stage" id="radar-stage">
+              <img id="radar-image" alt="Imagen de radar meteorológico" referrerpolicy="no-referrer">
+              <div id="radar-loading" class="viewer-loading">Cargando radar…</div>
+            </div>
+            <div class="viewer-toolbar">
+              <button id="radar-prev" class="control-button" type="button" aria-label="Cuadro anterior">←</button>
+              <button id="radar-play" class="control-button primary-control" type="button">Pausar</button>
+              <button id="radar-next" class="control-button" type="button" aria-label="Cuadro siguiente">→</button>
+              <div class="viewer-timeline"><strong id="radar-frame-time">—</strong><span id="radar-frame-count">—</span></div>
+              <span id="radar-status" class="status-badge">Sin cargar</span>
+            </div>
+          </article>
+        </div>
+
+        <div id="tab-satellite" class="tab-panel" hidden>
+          <div class="section-heading">
+            <div><p class="eyebrow">Topes nubosos · Argentina</p><h3>Satélite</h3></div>
+            <p id="satellite-updated" class="muted">—</p>
+          </div>
+          <article class="viewer-card card">
+            <div class="viewer-stage satellite-stage">
+              <img id="satellite-image" alt="Imagen satelital de topes nubosos" referrerpolicy="no-referrer">
+              <div id="satellite-loading" class="viewer-loading">Cargando satélite…</div>
+            </div>
+            <div class="viewer-toolbar">
+              <button id="satellite-prev" class="control-button" type="button" aria-label="Cuadro anterior">←</button>
+              <button id="satellite-play" class="control-button primary-control" type="button">Pausar</button>
+              <button id="satellite-next" class="control-button" type="button" aria-label="Cuadro siguiente">→</button>
+              <div class="viewer-timeline"><strong id="satellite-frame-time">—</strong><span id="satellite-frame-count">—</span></div>
+              <span id="satellite-status" class="status-badge">Sin cargar</span>
+            </div>
+          </article>
         </div>
       </section>
-    </section>
-
-    <section id="empty-state" class="empty-state">
-      <div class="empty-icon" aria-hidden="true">⌕</div>
-      <h2>Buscá una localidad para comenzar</h2>
-      <p>La consulta se resuelve dentro del navegador sobre el catálogo publicado. No se envía tu búsqueda a servicios externos.</p>
-    </section>
-
-    <section id="error-state" class="error-state" hidden>
-      <h2>No pudimos cargar los datos</h2>
-      <p id="error-message">Reintentá en unos minutos.</p>
-      <button id="retry-button" class="primary-button" type="button">Volver a intentar</button>
-    </section>
+    </div>
   </main>
 
   <footer class="site-footer">
-    <div>
-      <strong>Clima Argentina V2</strong>
-      <p>Sitio independiente. Datos meteorológicos oficiales publicados por el Servicio Meteorológico Nacional.</p>
+    <div class="container footer-inner">
+      <p>Información basada en datos oficiales del Servicio Meteorológico Nacional. Ante una emergencia, seguí las indicaciones de las autoridades.</p>
+      <p>ClimateProyectar <span id="footer-version">v2.0</span></p>
     </div>
-    <p id="footer-version">Publicación —</p>
   </footer>
 
-  <noscript>Esta interfaz necesita JavaScript para buscar y mostrar los datos meteorológicos.</noscript>
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+  <script src="./assets/js/app.js?v=2.0.0" defer></script>
 </body>
 </html>
