@@ -6,6 +6,8 @@
   const RECENT_KEY = "climateproyectar-v2-recientes";
   const CACHE_PREFIX = "climateproyectar-cache:";
   const ARGENTINA_TZ = "America/Argentina/Buenos_Aires";
+  const AUTO_REFRESH_MS = 5 * 60 * 1000;
+  const SOURCE_AGE_TICK_MS = 60 * 1000;
 
   const COL = Object.freeze({
     id: 0,
@@ -55,6 +57,7 @@
     alertsData: null,
     alertMapping: null,
     alertAreas: null,
+    areaLocalities: new Map(),
     alertsLoaded: false,
     alertMap: null,
     alertLayer: null,
@@ -64,6 +67,10 @@
     satelliteManifest: null,
     satelliteLoaded: false,
     activeTab: "summary",
+    refreshTimer: null,
+    sourceAgeTimer: null,
+    refreshInProgress: false,
+    lastRefreshAt: 0,
   };
 
   const animation = {
@@ -547,6 +554,55 @@
     return [];
   }
 
+  function buildAreaLocalityIndex() {
+    const index = new Map();
+    state.rows.forEach((row) => {
+      const localityId = Number(row[COL.id]);
+      localityAreaIds(localityId).forEach((areaId) => {
+        if (!index.has(areaId)) index.set(areaId, []);
+        index.get(areaId).push(row);
+      });
+    });
+    index.forEach((rows) => rows.sort((a, b) => displayName(a).localeCompare(displayName(b), "es-AR")));
+    state.areaLocalities = index;
+  }
+
+  function localitiesForArea(areaId) {
+    return state.areaLocalities.get(Number(areaId)) || [];
+  }
+
+  function localityNamesPreview(areaId, limit = 7) {
+    const rows = localitiesForArea(areaId);
+    if (!rows.length) return { count: 0, text: "Localidades no informadas" };
+    const names = rows.slice(0, limit).map(displayName);
+    const remaining = Math.max(0, rows.length - names.length);
+    return {
+      count: rows.length,
+      text: `${names.join(", ")}${remaining ? ` y ${remaining} más` : ""}`,
+    };
+  }
+
+  function localityGroupsForArea(areaId) {
+    const groups = new Map();
+    localitiesForArea(areaId).forEach((row) => {
+      const province = row[COL.province] || "Provincia no informada";
+      if (!groups.has(province)) groups.set(province, []);
+      groups.get(province).push(displayName(row));
+    });
+    return [...groups.entries()].sort((a, b) => a[0].localeCompare(b[0], "es-AR"));
+  }
+
+  function affectedLocalitiesHtml(areaId) {
+    const rows = localitiesForArea(areaId);
+    if (!rows.length) return "";
+    const groups = localityGroupsForArea(areaId);
+    return `<details class="affected-localities">
+      <summary>Ver las ${rows.length} localidades afectadas</summary>
+      <div class="affected-localities-groups">${groups.map(([province, names]) => `
+        <section><strong>${escapeHtml(province)}</strong><p>${escapeHtml(names.join(", "))}</p></section>`).join("")}</div>
+    </details>`;
+  }
+
   function filteredAlerts() {
     const records = Array.isArray(state.alertsData?.alerts) ? state.alertsData.alerts : [];
     const date = elements.alertDateFilter.value;
@@ -592,7 +648,7 @@
     }
 
     if (!allRecords.length) {
-      elements.localityAlerts.innerHTML = `<div class="locality-alert-summary"><h4>Sin alertas activas para ${escapeHtml(displayName(row))}</h4><p>Áreas asociadas: ${areaIds.join(", ")}.</p></div>`;
+      elements.localityAlerts.innerHTML = `<div class="locality-alert-summary"><h4>Sin alertas activas para ${escapeHtml(displayName(row))}</h4><p>No hay alertas meteorológicas vigentes para esta localidad en la información oficial disponible.</p></div>`;
       elements.summaryAlertBanner.innerHTML = "";
       return;
     }
@@ -613,9 +669,15 @@
     const records = filteredAlerts();
     elements.alertsList.innerHTML = records.length ? records.map((record) => {
       const events = (record.events || []).map(alertEventName);
+      const preview = localityNamesPreview(record.area_id);
+      const coverage = preview.count
+        ? `${preview.count} localidad${preview.count === 1 ? "" : "es"} afectada${preview.count === 1 ? "" : "s"}`
+        : "Cobertura territorial oficial";
       return `<article class="alert-record ${alertLevelClass(record.level)}">
         <strong>${escapeHtml(alertLevelName(record.level))} · ${escapeHtml(events.join(" · ") || "Fenómeno no informado")}</strong>
-        <span>${escapeHtml(formatDay(record.date))} · Área ${escapeHtml(record.area_id)}</span>
+        <span>${escapeHtml(formatDay(record.date))} · ${escapeHtml(coverage)}</span>
+        ${preview.count ? `<p class="alert-locality-preview"><strong>Localidades:</strong> ${escapeHtml(preview.text)}</p>` : ""}
+        ${affectedLocalitiesHtml(record.area_id)}
       </article>`;
     }).join("") : '<p class="loading-text">No hay alertas para los filtros elegidos.</p>';
   }
@@ -641,7 +703,19 @@
       onEachFeature: (feature, layer) => {
         const id = areaIdFromFeature(feature);
         const level = levels.get(id) || 1;
-        layer.bindPopup(`<strong>Área ${escapeHtml(id)}</strong><br>${escapeHtml(level >= 3 ? alertLevelName(level) : "Sin alerta activa")}`);
+        const areaRecords = filteredAlerts().filter((record) => Number(record.area_id) === id);
+        const events = [...new Set(areaRecords.flatMap((record) => (record.events || []).map(alertEventName)))];
+        const preview = localityNamesPreview(id, 10);
+        const title = level >= 3 ? `Alerta ${alertLevelName(level)}` : "Sin alerta activa";
+        const coverage = preview.count
+          ? `${preview.count} localidad${preview.count === 1 ? "" : "es"} en esta zona`
+          : "Cobertura territorial oficial";
+        layer.bindPopup(`<div class="map-alert-popup">
+          <strong>${escapeHtml(title)}</strong>
+          ${events.length ? `<span>${escapeHtml(events.join(" · "))}</span>` : ""}
+          <span>${escapeHtml(coverage)}</span>
+          ${preview.count ? `<small>${escapeHtml(preview.text)}</small>` : ""}
+        </div>`);
       },
     }).addTo(state.alertMap);
     elements.mapStatus.textContent = `${filteredAlerts().length} registros activos para los filtros seleccionados.`;
@@ -669,25 +743,32 @@
     if (state.activeTab === "alerts") state.alertMap.setView([lat, lon], 7);
   }
 
-  async function loadAlerts() {
-    if (state.alertsLoaded || state.config.alerts?.enabled === false) return;
+  async function loadAlerts(options = {}) {
+    const force = options.force === true;
+    if ((state.alertsLoaded && !force) || state.config.alerts?.enabled === false) return;
     const source = state.config.alerts;
     try {
-      const [manifest, alerts, mapping, areas] = await Promise.all([
-        state.alertsManifest || fetchJson(joinUrl(source.base_url, source.manifest || "manifiesto.json"), { cacheKey: "alerts-manifest" }),
-        fetchJson(joinUrl(source.base_url, source.alerts || "alertas.json"), { cacheKey: "alerts-data" }),
-        fetchJson(joinUrl(source.base_url, source.locality_map || "localidades_alerta.min.json"), { cacheKey: "alerts-mapping" }),
-        fetchJson(joinUrl(source.base_url, source.areas || "areas_alerta.geojson"), { cacheKey: "alerts-areas" }),
+      const manifest = options.manifest || state.alertsManifest || await fetchJson(
+        joinUrl(source.base_url, source.manifest || "manifiesto.json"),
+        { cacheKey: "alerts-manifest" },
+      );
+      const version = sourceTimestamp("alerts", manifest) || Date.now();
+      const [alerts, mapping, areas] = await Promise.all([
+        fetchJson(joinUrl(source.base_url, source.alerts || "alertas.json"), { cacheKey: "alerts-data", version }),
+        fetchJson(joinUrl(source.base_url, source.locality_map || "localidades_alerta.min.json"), { cacheKey: "alerts-mapping", version }),
+        fetchJson(joinUrl(source.base_url, source.areas || "areas_alerta.geojson"), { cacheKey: "alerts-areas", version }),
       ]);
       state.alertsManifest = manifest;
       state.alertsData = alerts;
       state.alertMapping = mapping;
       state.alertAreas = areas;
+      buildAreaLocalityIndex();
       state.alertsLoaded = true;
       updateSourceCard("alerts", manifest);
       renderAlertFilters();
       renderAlertsList();
       renderLocalityAlerts();
+      if (state.alertMap) refreshAlertMap();
       if (state.activeTab === "alerts") ensureAlertMap();
     } catch (error) {
       console.error(error);
@@ -789,10 +870,12 @@
     }
   }
 
-  async function loadRadar() {
-    if (state.radarLoaded || state.config.radar?.enabled === false) return;
+  async function loadRadar(options = {}) {
+    const force = options.force === true;
+    if ((state.radarLoaded && !force) || state.config.radar?.enabled === false) return;
     try {
-      const manifest = state.radarManifest || await fetchJson(joinUrl(state.config.radar.base_url, state.config.radar.manifest || "manifiesto.json"), { cacheKey: "radar-manifest" });
+      const previousProduct = options.productId || elements.radarProduct.value;
+      const manifest = options.manifest || state.radarManifest || await fetchJson(joinUrl(state.config.radar.base_url, state.config.radar.manifest || "manifiesto.json"), { cacheKey: "radar-manifest" });
       state.radarManifest = manifest;
       state.radarLoaded = true;
       updateSourceCard("radar", manifest);
@@ -805,7 +888,10 @@
         groups.mosaic.length ? `<optgroup label="Mosaicos">${groups.mosaic.map((item) => `<option value="${escapeHtml(item.id)}">${escapeHtml(item.name)}${item.status === "no_data" ? " · sin datos" : ""}</option>`).join("")}</optgroup>` : "",
         groups.radar.length ? `<optgroup label="Radares individuales">${groups.radar.map((item) => `<option value="${escapeHtml(item.id)}">${escapeHtml(item.name)}${item.province ? ` · ${escapeHtml(item.province)}` : ""}${item.status === "no_data" ? " · sin datos" : ""}</option>`).join("")}</optgroup>` : "",
       ].join("");
-      chooseRadarProduct(products.find((item) => item.id === "COMP_ARG")?.id || products[0]?.id);
+      const preferredProduct = products.find((item) => String(item.id) === String(previousProduct))?.id
+        || products.find((item) => item.id === "COMP_ARG")?.id
+        || products[0]?.id;
+      chooseRadarProduct(preferredProduct);
     } catch (error) {
       console.error(error);
       updateSourceCard("radar", null, error);
@@ -814,10 +900,11 @@
     }
   }
 
-  async function loadSatellite() {
-    if (state.satelliteLoaded || state.config.satellite?.enabled === false) return;
+  async function loadSatellite(options = {}) {
+    const force = options.force === true;
+    if ((state.satelliteLoaded && !force) || state.config.satellite?.enabled === false) return;
     try {
-      const manifest = state.satelliteManifest || await fetchJson(joinUrl(state.config.satellite.base_url, state.config.satellite.manifest || "manifiesto.json"), { cacheKey: "satellite-manifest" });
+      const manifest = options.manifest || state.satelliteManifest || await fetchJson(joinUrl(state.config.satellite.base_url, state.config.satellite.manifest || "manifiesto.json"), { cacheKey: "satellite-manifest" });
       state.satelliteManifest = manifest;
       state.satelliteLoaded = true;
       updateSourceCard("satellite", manifest);
@@ -854,6 +941,120 @@
       }
     });
     await Promise.allSettled(jobs);
+  }
+
+  function sourceChanged(source, previous, next) {
+    return String(sourceTimestamp(source, previous) || "") !== String(sourceTimestamp(source, next) || "");
+  }
+
+  async function refreshObservations() {
+    const source = state.config.observations;
+    const nextManifest = await fetchJson(
+      joinUrl(source.base_url, source.manifest || "manifiesto.json"),
+      { cacheKey: "observations-manifest" },
+    );
+    const changed = sourceChanged("observations", state.observationsManifest, nextManifest);
+    state.observationsManifest = nextManifest;
+    updateSourceCard("observations", nextManifest);
+    if (!changed) return;
+    const stationsPath = nextManifest.files?.stations?.path || "estaciones.min.json";
+    const stationsValue = await fetchJson(
+      joinUrl(source.base_url, stationsPath),
+      { cacheKey: "observations-stations", version: sourceTimestamp("observations", nextManifest) || Date.now() },
+    );
+    state.stations = stationsValue.records || stationsValue.stations || stationsValue || {};
+    const selectedRow = state.rowsById.get(state.selectedId);
+    if (selectedRow) setObservation(selectedRow);
+  }
+
+  async function refreshForecasts() {
+    const source = state.config.forecasts;
+    const nextManifest = await fetchJson(
+      joinUrl(source.base_url, source.manifest || "manifiesto.json"),
+      { cacheKey: "forecasts-manifest" },
+    );
+    const changed = sourceChanged("forecasts", state.forecastsManifest, nextManifest);
+    state.forecastsManifest = nextManifest;
+    updateSourceCard("forecasts", nextManifest);
+    const selectedRow = state.rowsById.get(state.selectedId);
+    if (changed && selectedRow) await loadForecast(selectedRow);
+  }
+
+  async function refreshAlerts() {
+    const source = state.config.alerts;
+    if (!source || source.enabled === false) return;
+    const nextManifest = await fetchJson(
+      joinUrl(source.base_url, source.manifest || "manifiesto.json"),
+      { cacheKey: "alerts-manifest" },
+    );
+    const changed = sourceChanged("alerts", state.alertsManifest, nextManifest);
+    state.alertsManifest = nextManifest;
+    updateSourceCard("alerts", nextManifest);
+    if (changed && state.alertsLoaded) await loadAlerts({ force: true, manifest: nextManifest });
+  }
+
+  async function refreshRadar() {
+    const source = state.config.radar;
+    if (!source || source.enabled === false) return;
+    const nextManifest = await fetchJson(
+      joinUrl(source.base_url, source.manifest || "manifiesto.json"),
+      { cacheKey: "radar-manifest" },
+    );
+    const changed = sourceChanged("radar", state.radarManifest, nextManifest);
+    state.radarManifest = nextManifest;
+    updateSourceCard("radar", nextManifest);
+    if (changed && state.radarLoaded) {
+      await loadRadar({ force: true, manifest: nextManifest, productId: elements.radarProduct.value });
+    }
+  }
+
+  async function refreshSatellite() {
+    const source = state.config.satellite;
+    if (!source || source.enabled === false) return;
+    const nextManifest = await fetchJson(
+      joinUrl(source.base_url, source.manifest || "manifiesto.json"),
+      { cacheKey: "satellite-manifest" },
+    );
+    const changed = sourceChanged("satellite", state.satelliteManifest, nextManifest);
+    state.satelliteManifest = nextManifest;
+    updateSourceCard("satellite", nextManifest);
+    if (changed && state.satelliteLoaded) await loadSatellite({ force: true, manifest: nextManifest });
+  }
+
+  async function refreshDataSources() {
+    if (!state.config || state.refreshInProgress || document.hidden) return;
+    state.refreshInProgress = true;
+    try {
+      const results = await Promise.allSettled([
+        refreshObservations(),
+        refreshForecasts(),
+        refreshAlerts(),
+        refreshRadar(),
+        refreshSatellite(),
+      ]);
+      results.forEach((result) => {
+        if (result.status === "rejected") console.error("Actualización automática:", result.reason);
+      });
+      state.lastRefreshAt = Date.now();
+    } finally {
+      state.refreshInProgress = false;
+    }
+  }
+
+  function refreshSourceAges() {
+    updateSourceCard("observations", state.observationsManifest);
+    updateSourceCard("forecasts", state.forecastsManifest);
+    updateSourceCard("alerts", state.alertsManifest);
+    updateSourceCard("radar", state.radarManifest);
+    updateSourceCard("satellite", state.satelliteManifest);
+  }
+
+  function startAutoRefresh() {
+    if (state.refreshTimer) window.clearInterval(state.refreshTimer);
+    if (state.sourceAgeTimer) window.clearInterval(state.sourceAgeTimer);
+    state.refreshTimer = window.setInterval(refreshDataSources, AUTO_REFRESH_MS);
+    state.sourceAgeTimer = window.setInterval(refreshSourceAges, SOURCE_AGE_TICK_MS);
+    state.lastRefreshAt = Date.now();
   }
 
   function openTab(name) {
@@ -893,6 +1094,7 @@
     elements.errorState.hidden = true;
     elements.resultSection.hidden = false;
     elements.locationTitle.textContent = displayName(row);
+    document.title = `${displayName(row)} | ClimateProyectar`;
     elements.locationSubtitle.textContent = [row[COL.type], row[COL.department], row[COL.province]].filter(Boolean).join(" · ");
     if (!options.skipUrl) setUrl(Number(id));
     saveRecent(Number(id));
@@ -1003,6 +1205,7 @@
       updateSourceCard("forecasts", forecastsManifest);
       renderRecent();
       loadBackgroundManifests();
+      startAutoRefresh();
 
       const id = Number(new URL(window.location.href).searchParams.get("id"));
       if (Number.isFinite(id) && state.rowsById.has(id)) selectLocality(id, { skipUrl: true, instant: true });
@@ -1075,6 +1278,7 @@
     } else {
       if (animation.radar.playing && animation.radar.frames.length) startAnimation("radar");
       if (animation.satellite.playing && animation.satellite.frames.length) startAnimation("satellite");
+      if (Date.now() - state.lastRefreshAt >= AUTO_REFRESH_MS) refreshDataSources();
     }
   });
 

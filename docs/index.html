@@ -9,7 +9,7 @@
   <link rel="preconnect" href="https://raw.githubusercontent.com" crossorigin>
   <link rel="preconnect" href="https://estaticos.smn.gob.ar" crossorigin>
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIINfQ3ynvY5teQspI3Qerj9Q2Zsc3Qe7mM=" crossorigin="">
-  <link rel="stylesheet" href="./assets/css/styles.css?v=2.0.0">
+  <link rel="stylesheet" href="./assets/css/styles.css?v=2.1.0">
 </head>
 <body>
   <a class="skip-link" href="#main-content">Saltar al contenido</a>
@@ -62,12 +62,15 @@
     </section>
 
     <section class="source-strip" aria-label="Estado de las fuentes">
-      <div class="container source-grid" id="source-grid">
-        <article class="source-card" data-source="observations"><span>Observaciones</span><strong>Cargando…</strong></article>
-        <article class="source-card" data-source="forecasts"><span>Pronósticos</span><strong>Cargando…</strong></article>
-        <article class="source-card" data-source="alerts"><span>Alertas</span><strong>Cargando…</strong></article>
-        <article class="source-card" data-source="radar"><span>Radar</span><strong>Cargando…</strong></article>
-        <article class="source-card" data-source="satellite"><span>Satélite</span><strong>Cargando…</strong></article>
+      <div class="container">
+        <div class="source-grid" id="source-grid">
+          <article class="source-card" data-source="observations"><span>Observaciones</span><strong>Cargando…</strong></article>
+          <article class="source-card" data-source="forecasts"><span>Pronósticos</span><strong>Cargando…</strong></article>
+          <article class="source-card" data-source="alerts"><span>Alertas</span><strong>Cargando…</strong></article>
+          <article class="source-card" data-source="radar"><span>Radar</span><strong>Cargando…</strong></article>
+          <article class="source-card" data-source="satellite"><span>Satélite</span><strong>Cargando…</strong></article>
+        </div>
+        <p class="source-refresh-note">Los datos se verifican automáticamente cada 5 minutos, sin recargar la página.</p>
       </div>
     </section>
 
@@ -216,11 +219,11 @@
   <footer class="site-footer">
     <div class="container footer-inner">
       <p>Información basada en datos oficiales del Servicio Meteorológico Nacional. Ante una emergencia, seguí las indicaciones de las autoridades.</p>
-      <p>ClimateProyectar <span id="footer-version">v2.0</span></p>
+      <p>ClimateProyectar <span id="footer-version">v2.1</span></p>
     </div>
   </footer>
 
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
-  <script src="./assets/js/app.js?v=2.0.0" defer></script>
+  <script src="./assets/js/app.js?v=2.1.0" defer></script>
 </body>
 </html>
