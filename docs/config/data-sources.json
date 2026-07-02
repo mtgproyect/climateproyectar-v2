@@ -1,0 +1,23 @@
+{
+  "schema_version": 1,
+  "catalog": {
+    "base_url": "./data",
+    "manifest": "manifiesto.json"
+  },
+  "observations": {
+    "base_url": "https://mtgproyect.github.io/climate-observations",
+    "manifest": "manifiesto.json"
+  },
+  "forecasts": {
+    "base_url": "https://mtgproyect.github.io/climate-forecasts",
+    "manifest": "manifiesto.json"
+  },
+  "radar": {
+    "enabled": false,
+    "base_url": "https://mtgproyect.github.io/climate-radar"
+  },
+  "satellite": {
+    "enabled": false,
+    "base_url": "https://mtgproyect.github.io/climate-satellite"
+  }
+}

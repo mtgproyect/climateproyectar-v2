@@ -1,0 +1,24 @@
+name: Validar sitio
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  validar:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Validar contrato estático
+        run: python -m unittest discover -s tests -v
+      - name: Validar JavaScript
+        run: |
+          node --check docs/assets/js/app.js
+          node tests/test_date_utils.js

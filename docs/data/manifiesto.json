@@ -1,0 +1,1 @@
+{"schema_version":1,"generated_at":"2026-07-01T21:10:47.539455+00:00","counts":{"localities":10601},"files":{"localities":{"path":"localidades.min.json","bytes":1231014,"sha256":"2cb327ff0863d70174d7b93c2900c129ca30ed29371884380be1d0d2c832c1ce"}},"validation":{"duplicate_locality_ids":false,"all_localities_mapped":true}}
