@@ -39,6 +39,13 @@
     satellite: 50,
   };
 
+  // Vista nacional fija para el mapa temático de alertas.
+  // Evita mosaicos externos, desplazamientos y acercamientos que corten el país.
+  const ARGENTINA_MAP_BOUNDS = [
+    [-55.35, -73.75],
+    [-21.45, -53.45],
+  ];
+
   const state = {
     config: null,
     aliases: {},
@@ -686,50 +693,109 @@
     return Number(feature?.properties?.gid ?? feature?.properties?.area_id ?? feature?.properties?.id ?? feature?.id);
   }
 
+  function fitArgentinaAlertMap() {
+    if (!state.alertMap || !window.L) return;
+    state.alertMap.fitBounds(window.L.latLngBounds(ARGENTINA_MAP_BOUNDS), {
+      animate: false,
+      paddingTopLeft: [24, 20],
+      paddingBottomRight: [24, 20],
+    });
+  }
+
   function refreshAlertMap() {
     if (!state.alertMap || !state.alertAreas || !window.L) return;
+
+    const visibleRecords = filteredAlerts();
+    const recordsByArea = new Map();
     const levels = new Map();
-    filteredAlerts().forEach((record) => {
+
+    visibleRecords.forEach((record) => {
       const id = Number(record.area_id);
+      if (!recordsByArea.has(id)) recordsByArea.set(id, []);
+      recordsByArea.get(id).push(record);
       levels.set(id, Math.max(levels.get(id) || 1, Number(record.level) || 1));
     });
+
     if (state.alertLayer) state.alertLayer.remove();
+
     state.alertLayer = window.L.geoJSON(state.alertAreas, {
       style: (feature) => {
         const level = levels.get(areaIdFromFeature(feature)) || 1;
-        const color = ({ 3: "#d6b900", 4: "#e97813", 5: "#d52d27" })[level] || "#637b8c";
-        return { color, weight: level >= 3 ? 1.4 : .4, fillColor: color, fillOpacity: level >= 3 ? .48 : .035 };
+        const active = level >= 3;
+        const color = ({ 3: "#d6b900", 4: "#e97813", 5: "#d52d27" })[level] || "#a8bbc7";
+        return {
+          className: "alert-area-shape",
+          color,
+          weight: active ? 1.35 : 0.55,
+          opacity: 1,
+          fillColor: active ? color : "#f7fafc",
+          fillOpacity: active ? 0.72 : 0.94,
+        };
       },
       onEachFeature: (feature, layer) => {
         const id = areaIdFromFeature(feature);
         const level = levels.get(id) || 1;
-        const areaRecords = filteredAlerts().filter((record) => Number(record.area_id) === id);
+        const active = level >= 3;
+        const areaRecords = recordsByArea.get(id) || [];
         const events = [...new Set(areaRecords.flatMap((record) => (record.events || []).map(alertEventName)))];
         const preview = localityNamesPreview(id, 10);
-        const title = level >= 3 ? `Alerta ${alertLevelName(level)}` : "Sin alerta activa";
+        const title = active ? `Alerta ${alertLevelName(level)}` : "Sin alerta activa";
         const coverage = preview.count
           ? `${preview.count} localidad${preview.count === 1 ? "" : "es"} en esta zona`
           : "Cobertura territorial oficial";
+
         layer.bindPopup(`<div class="map-alert-popup">
           <strong>${escapeHtml(title)}</strong>
           ${events.length ? `<span>${escapeHtml(events.join(" · "))}</span>` : ""}
           <span>${escapeHtml(coverage)}</span>
           ${preview.count ? `<small>${escapeHtml(preview.text)}</small>` : ""}
-        </div>`);
+        </div>`, { closeButton: false, maxWidth: 300 });
+
+        layer.on({
+          mouseover: () => layer.setStyle({ weight: active ? 2.2 : 1.25, fillOpacity: active ? 0.86 : 1 }),
+          mouseout: () => state.alertLayer?.resetStyle(layer),
+        });
       },
     }).addTo(state.alertMap);
-    elements.mapStatus.textContent = `${filteredAlerts().length} registros activos para los filtros seleccionados.`;
+
+    fitArgentinaAlertMap();
+    focusSelectedLocalityOnMap();
+    elements.mapStatus.textContent = `Mapa temático nacional · ${visibleRecords.length} registros activos para los filtros seleccionados.`;
   }
 
   function ensureAlertMap() {
     if (state.alertMap || !window.L || !state.alertAreas) return;
-    state.alertMap = window.L.map("alert-map", { minZoom: 3 }).setView([-38.4, -64.2], 4);
-    window.L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
-      maxZoom: 18,
-      attribution: "© OpenStreetMap contributors",
-    }).addTo(state.alertMap);
+
+    state.alertMap = window.L.map("alert-map", {
+      zoomControl: false,
+      attributionControl: false,
+      scrollWheelZoom: false,
+      doubleClickZoom: false,
+      boxZoom: false,
+      keyboard: false,
+      dragging: false,
+      touchZoom: false,
+      preferCanvas: true,
+      minZoom: 3,
+      maxZoom: 6,
+      zoomSnap: 0.25,
+    });
+
+    const legend = window.L.control({ position: "bottomleft" });
+    legend.onAdd = () => {
+      const node = window.L.DomUtil.create("div", "alert-map-legend");
+      node.innerHTML = `
+        <strong>Nivel de alerta</strong>
+        <span><i class="legend-swatch yellow"></i> Amarillo</span>
+        <span><i class="legend-swatch orange"></i> Naranja</span>
+        <span><i class="legend-swatch red"></i> Rojo</span>
+        <span><i class="legend-swatch neutral"></i> Sin alerta</span>`;
+      return node;
+    };
+    legend.addTo(state.alertMap);
+
+    fitArgentinaAlertMap();
     refreshAlertMap();
-    focusSelectedLocalityOnMap();
   }
 
   function focusSelectedLocalityOnMap() {
@@ -738,9 +804,29 @@
     const lat = Number(row?.[COL.lat]);
     const lon = Number(row?.[COL.lon]);
     if (!Number.isFinite(lat) || !Number.isFinite(lon)) return;
+
     if (state.localityMarker) state.localityMarker.remove();
-    state.localityMarker = window.L.marker([lat, lon]).addTo(state.alertMap).bindPopup(escapeHtml(displayName(row)));
-    if (state.activeTab === "alerts") state.alertMap.setView([lat, lon], 7);
+
+    const markerIcon = window.L.divIcon({
+      className: "locality-map-marker",
+      html: '<span aria-hidden="true"></span>',
+      iconSize: [20, 20],
+      iconAnchor: [10, 10],
+    });
+
+    state.localityMarker = window.L.marker([lat, lon], {
+      icon: markerIcon,
+      keyboard: false,
+      zIndexOffset: 1000,
+    }).addTo(state.alertMap).bindTooltip(escapeHtml(displayName(row)), {
+      permanent: true,
+      direction: "top",
+      offset: [0, -11],
+      className: "locality-map-label",
+    });
+
+    // La vista permanece nacional: la localidad se señala sin acercar ni desplazar el mapa.
+    fitArgentinaAlertMap();
   }
 
   async function loadAlerts(options = {}) {
@@ -1072,7 +1158,10 @@
     if (name === "alerts") {
       loadAlerts().then(() => {
         ensureAlertMap();
-        window.setTimeout(() => state.alertMap?.invalidateSize(), 100);
+        window.setTimeout(() => {
+          state.alertMap?.invalidateSize({ animate: false });
+          fitArgentinaAlertMap();
+        }, 100);
       });
     }
     if (name === "radar") loadRadar();
