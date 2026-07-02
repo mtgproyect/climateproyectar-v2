@@ -1,23 +1,39 @@
 {
   "schema_version": 1,
+
   "catalog": {
     "base_url": "./data",
     "manifest": "manifiesto.json"
   },
+
   "observations": {
-    "base_url": "https://mtgproyect.github.io/climate-observations",
+    "base_url": "https://raw.githubusercontent.com/mtgproyect/climate-observations/main/docs",
     "manifest": "manifiesto.json"
   },
+
   "forecasts": {
-    "base_url": "https://mtgproyect.github.io/climate-forecasts",
+    "base_url": "https://raw.githubusercontent.com/mtgproyect/climate-forecasts/main/docs",
     "manifest": "manifiesto.json"
   },
+
   "radar": {
     "enabled": false,
-    "base_url": "https://mtgproyect.github.io/climate-radar"
+    "base_url": "https://raw.githubusercontent.com/mtgproyect/climate-radar/main/docs",
+    "manifest": "manifiesto.json"
   },
+
   "satellite": {
     "enabled": false,
-    "base_url": "https://mtgproyect.github.io/climate-satellite"
+    "base_url": "https://raw.githubusercontent.com/mtgproyect/climate-satellite/main/docs",
+    "manifest": "manifiesto.json"
+  },
+
+  "alerts": {
+    "enabled": false,
+    "base_url": "https://raw.githubusercontent.com/mtgproyect/climate-alerts/main/docs",
+    "manifest": "manifiesto.json",
+    "alerts": "alertas.json",
+    "locality_map": "localidades_alerta.min.json",
+    "areas": "areas_alerta.geojson"
   }
 }
