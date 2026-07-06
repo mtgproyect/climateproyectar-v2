@@ -8,6 +8,10 @@
   const ARGENTINA_TZ = "America/Argentina/Buenos_Aires";
   const AUTO_REFRESH_MS = 5 * 60 * 1000;
   const SOURCE_AGE_TICK_MS = 60 * 1000;
+  const DEFAULT_LOCALITY_ID = 4864;
+  const AUTO_IP_LOCATION_ENABLED = true;
+  const AUTO_IP_LOCATION_URL = "https://ipapi.co/json/";
+  const AUTO_IP_LOCATION_TIMEOUT_MS = 1400;
 
   const COL = Object.freeze({
     id: 0,
@@ -413,7 +417,8 @@
 
   function setUrl(id) {
     const url = new URL(window.location.href);
-    url.searchParams.set("id", String(id));
+    if (Number(id) === DEFAULT_LOCALITY_ID) url.searchParams.delete("id");
+    else url.searchParams.set("id", String(id));
     history.pushState({ localityId: id }, "", url);
   }
 
@@ -1186,7 +1191,7 @@
     document.title = `${displayName(row)} | ClimateProyectar`;
     elements.locationSubtitle.textContent = [row[COL.type], row[COL.department], row[COL.province]].filter(Boolean).join(" · ");
     if (!options.skipUrl) setUrl(Number(id));
-    saveRecent(Number(id));
+    if (options.saveRecent !== false) saveRecent(Number(id));
     setObservation(row);
     loadForecast(row);
     loadAlerts().then(() => {
@@ -1233,6 +1238,121 @@
       elements.locationButton.textContent = "Usar mi ubicación";
       elements.searchStatus.textContent = error.code === 1 ? "No se concedió permiso de ubicación." : "No se pudo obtener la ubicación.";
     }, { enableHighAccuracy: false, timeout: 12000, maximumAge: 300000 });
+  }
+
+
+  function validLocalityId(value) {
+    const id = Number(value);
+    return Number.isFinite(id) && state.rowsById.has(id) ? id : null;
+  }
+
+  function cleanCurrentUrlForDefaultLocality(id) {
+    if (Number(id) !== DEFAULT_LOCALITY_ID) return;
+    const url = new URL(window.location.href);
+    if (!url.searchParams.has("id")) return;
+    url.searchParams.delete("id");
+    history.replaceState({ localityId: DEFAULT_LOCALITY_ID }, "", url);
+  }
+
+  function localIpController(timeoutMs) {
+    const controller = new AbortController();
+    const timer = window.setTimeout(() => controller.abort(), timeoutMs);
+    return { controller, timer };
+  }
+
+  async function fetchIpLocation() {
+    if (!AUTO_IP_LOCATION_ENABLED) return null;
+    const { controller, timer } = localIpController(AUTO_IP_LOCATION_TIMEOUT_MS);
+    try {
+      const response = await fetch(AUTO_IP_LOCATION_URL, {
+        cache: "no-store",
+        signal: controller.signal,
+        referrerPolicy: "no-referrer",
+      });
+      if (!response.ok) throw new Error(`HTTP ${response.status}`);
+      return await response.json();
+    } finally {
+      window.clearTimeout(timer);
+    }
+  }
+
+  function localityFromIpData(data) {
+    if (!data) return null;
+
+    const country = String(data.country_code || data.country || "").toUpperCase();
+    if (country && country !== "AR" && country !== "ARG") return null;
+
+    const lat = Number(data.latitude ?? data.lat);
+    const lon = Number(data.longitude ?? data.lon);
+    if (Number.isFinite(lat) && Number.isFinite(lon)) {
+      const nearest = nearestLocality(lat, lon);
+      if (nearest.row && nearest.distance <= 350) return nearest.row;
+    }
+
+    const city = String(data.city || "").trim();
+    const region = String(data.region || data.region_code || "").trim();
+    const candidates = [
+      city && region ? `${city} ${region}` : "",
+      city,
+      region,
+      /buenos\s+aires/i.test(`${city} ${region}`) ? "Ciudad Autónoma de Buenos Aires" : "",
+      "Capital Federal",
+      "CABA",
+    ].filter(Boolean);
+
+    const seen = new Set();
+    for (const candidate of candidates) {
+      const key = normalizeText(candidate);
+      if (!key || seen.has(key)) continue;
+      seen.add(key);
+      const row = searchRows(candidate)[0];
+      if (row) return row;
+    }
+
+    return null;
+  }
+
+  async function localityFromApproximateIp() {
+    try {
+      const data = await fetchIpLocation();
+      return localityFromIpData(data);
+    } catch (error) {
+      console.info("Ubicación aproximada por IP no disponible:", error);
+      return null;
+    }
+  }
+
+  async function chooseInitialLocality() {
+    const requestedId = validLocalityId(new URL(window.location.href).searchParams.get("id"));
+    if (requestedId) {
+      selectLocality(requestedId, { skipUrl: true, instant: true });
+      cleanCurrentUrlForDefaultLocality(requestedId);
+      return;
+    }
+
+    const recentId = getRecentIds().map(validLocalityId).find(Boolean);
+    if (recentId) {
+      selectLocality(recentId, { skipUrl: true, instant: true, saveRecent: false });
+      cleanCurrentUrlForDefaultLocality(recentId);
+      elements.searchStatus.textContent = `${elements.searchStatus.textContent} · Localidad reciente.`;
+      return;
+    }
+
+    const ipRow = await localityFromApproximateIp();
+    if (ipRow) {
+      selectLocality(Number(ipRow[COL.id]), { skipUrl: true, instant: true, saveRecent: false });
+      cleanCurrentUrlForDefaultLocality(ipRow[COL.id]);
+      elements.searchStatus.textContent = `${localityLabel(ipRow)} · Ubicación aproximada por red.`;
+      return;
+    }
+
+    const fallbackId = validLocalityId(DEFAULT_LOCALITY_ID) || validLocalityId(4864) || Number(state.rows[0]?.[COL.id]);
+    if (fallbackId) {
+      const row = state.rowsById.get(fallbackId);
+      selectLocality(fallbackId, { skipUrl: true, instant: true, saveRecent: false });
+      cleanCurrentUrlForDefaultLocality(fallbackId);
+      if (row) elements.searchStatus.textContent = `${localityLabel(row)} · Localidad inicial predeterminada.`;
+    }
   }
 
   async function shareCurrent() {
@@ -1296,8 +1416,7 @@
       loadBackgroundManifests();
       startAutoRefresh();
 
-      const id = Number(new URL(window.location.href).searchParams.get("id"));
-      if (Number.isFinite(id) && state.rowsById.has(id)) selectLocality(id, { skipUrl: true, instant: true });
+      await chooseInitialLocality();
     } catch (error) {
       showFatal(error);
     }
@@ -1356,8 +1475,8 @@
   elements.satellitePlay.addEventListener("click", () => toggleAnimation("satellite"));
 
   window.addEventListener("popstate", (event) => {
-    const id = Number(event.state?.localityId || new URL(window.location.href).searchParams.get("id"));
-    if (Number.isFinite(id) && state.rowsById.has(id)) selectLocality(id, { skipUrl: true, instant: true });
+    const id = validLocalityId(event.state?.localityId || new URL(window.location.href).searchParams.get("id") || DEFAULT_LOCALITY_ID);
+    if (id) selectLocality(id, { skipUrl: true, instant: true, saveRecent: false });
   });
 
   document.addEventListener("visibilitychange", () => {
