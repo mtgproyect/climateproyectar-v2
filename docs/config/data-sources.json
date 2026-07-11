@@ -1,22 +1,22 @@
 {
   "schema_version": 2,
   "catalog": {
-    "base_url": "./data",
+    "base_url": "https://data.weathervar.com/data",
     "manifest": "manifiesto.json"
   },
   "observations": {
     "enabled": true,
-    "base_url": "https://raw.githubusercontent.com/mtgproyect/climate-observations/main/docs",
+    "base_url": "https://data.weathervar.com/observations",
     "manifest": "manifiesto.json"
   },
   "forecasts": {
     "enabled": true,
-    "base_url": "https://raw.githubusercontent.com/mtgproyect/climate-forecasts/main/docs",
+    "base_url": "https://data.weathervar.com/forecasts",
     "manifest": "manifiesto.json"
   },
   "alerts": {
     "enabled": true,
-    "base_url": "https://raw.githubusercontent.com/mtgproyect/climate-alerts/main/docs",
+    "base_url": "https://data.weathervar.com/alerts",
     "manifest": "manifiesto.json",
     "alerts": "alertas.json",
     "locality_map": "localidades_alerta.min.json",
@@ -24,12 +24,12 @@
   },
   "radar": {
     "enabled": true,
-    "base_url": "https://raw.githubusercontent.com/mtgproyect/climate-radar/main/docs",
+    "base_url": "https://data.weathervar.com/radar",
     "manifest": "manifiesto.json"
   },
   "satellite": {
     "enabled": true,
-    "base_url": "https://raw.githubusercontent.com/mtgproyect/climate-satellite/main/docs",
+    "base_url": "https://data.weathervar.com/satellite",
     "manifest": "manifiesto.json"
   }
 }
