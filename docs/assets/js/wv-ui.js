@@ -38,5 +38,24 @@
     const observer=new MutationObserver(()=>document.querySelectorAll(".forecast-grid,.mini-forecast-grid,#alerts-list,.alert-map-explainer,.source-grid,.metrics-grid").forEach(makeDraggable));
     observer.observe(document.body,{childList:true,subtree:true});
   }
-  ready(()=>{installMenu();installDrag();});
+
+  function installAffectedLocalitiesDetails(){
+    document.addEventListener("click", (event)=>{
+      const summary = event.target.closest(".affected-localities > summary");
+      if(!summary) return;
+      const details = summary.closest(".affected-localities");
+      const card = summary.closest(".alert-record");
+      if(!details) return;
+      event.preventDefault();
+      const willOpen = !details.open;
+      details.open = willOpen;
+      if(card){
+        card.classList.toggle("is-expanded", willOpen);
+        if(willOpen){
+          setTimeout(()=>card.scrollIntoView({block:"nearest", inline:"nearest", behavior:"smooth"}), 30);
+        }
+      }
+    }, true);
+  }
+  ready(()=>{installMenu();installDrag();installAffectedLocalitiesDetails();});
 })();

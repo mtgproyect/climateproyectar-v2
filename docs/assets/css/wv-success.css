@@ -454,3 +454,90 @@ body{font-family:var(--wv-font)!important;}
     scroll-margin-top:138px!important;
   }
 }
+
+/* =========================================================
+   FIX: detalle de localidades afectadas en alertas
+   - En PC el carrusel horizontal no debe cortar el <details>.
+   - Al abrir "Ver las localidades afectadas", la tarjeta se expande.
+   ========================================================= */
+#alerts-list {
+  align-items: flex-start !important;
+  overflow-x: auto !important;
+  overflow-y: visible !important;
+  padding-bottom: 30px !important;
+}
+
+.alerts-list-card {
+  overflow: visible !important;
+}
+
+.alert-record {
+  min-height: auto !important;
+}
+
+.alert-record.is-expanded,
+.alert-record:has(.affected-localities[open]) {
+  flex-basis: min(760px, 92vw) !important;
+  overflow: visible !important;
+  z-index: 5;
+}
+
+.alert-record.is-expanded .affected-localities,
+.alert-record:has(.affected-localities[open]) .affected-localities {
+  position: relative;
+  z-index: 6;
+}
+
+.affected-localities summary {
+  display: inline-flex !important;
+  align-items: center;
+  gap: 8px;
+  min-height: 36px;
+  padding: 8px 12px;
+  border: 1px solid #cce7f0;
+  border-radius: 999px;
+  background: #eefaff;
+  color: #07536c !important;
+  cursor: pointer;
+  user-select: none;
+}
+
+.affected-localities summary::-webkit-details-marker {
+  display: none;
+}
+
+.affected-localities summary::after {
+  content: "+";
+  font-weight: 900;
+}
+
+.affected-localities[open] summary::after {
+  content: "−";
+}
+
+.affected-localities-groups {
+  max-height: 280px !important;
+  overflow: auto !important;
+  margin-top: 12px !important;
+  padding: 12px !important;
+  border: 1px solid #d9edf4;
+  border-radius: 16px;
+  background: #f7fcfe;
+}
+
+.affected-localities-groups section {
+  background: #ffffff !important;
+  border: 1px solid #e1f0f5;
+}
+
+.affected-localities-groups p {
+  margin: 5px 0 0;
+  line-height: 1.55;
+}
+
+@media (max-width: 720px) {
+  .alert-record.is-expanded,
+  .alert-record:has(.affected-localities[open]) {
+    flex-basis: calc(100vw - 42px) !important;
+  }
+}
