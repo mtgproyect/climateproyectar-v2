@@ -1,0 +1,35 @@
+{
+  "schema_version": 2,
+  "catalog": {
+    "base_url": "https://data.weathervar.com/data",
+    "manifest": "manifiesto.json"
+  },
+  "observations": {
+    "enabled": true,
+    "base_url": "https://data.weathervar.com/observations",
+    "manifest": "manifiesto.json"
+  },
+  "forecasts": {
+    "enabled": true,
+    "base_url": "https://data.weathervar.com/forecasts",
+    "manifest": "manifiesto.json"
+  },
+  "alerts": {
+    "enabled": true,
+    "base_url": "https://data.weathervar.com/alerts",
+    "manifest": "manifiesto.json",
+    "alerts": "alertas.json",
+    "locality_map": "localidades_alerta.min.json",
+    "areas": "areas_alerta.geojson"
+  },
+  "radar": {
+    "enabled": true,
+    "base_url": "https://data.weathervar.com/radar",
+    "manifest": "manifiesto.json"
+  },
+  "satellite": {
+    "enabled": true,
+    "base_url": "https://data.weathervar.com/satellite",
+    "manifest": "manifiesto.json"
+  }
+}

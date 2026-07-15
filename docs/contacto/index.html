@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="es-AR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Contacto · WeatherVar</title>
+  <meta name="description" content="Canal de contacto del proyecto WeatherVar.">
+  <meta name="robots" content="index,follow,max-image-preview:large">
+  <link rel="canonical" href="https://www.weathervar.com/contacto/">
+  <meta property="og:title" content="Contacto · WeatherVar">
+  <meta property="og:description" content="Canal de contacto del proyecto WeatherVar.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://www.weathervar.com/contacto/">
+  <meta property="og:image" content="https://www.weathervar.com/assets/img/og-weatherVar.png">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Contacto · WeatherVar">
+  <meta name="twitter:description" content="Canal de contacto del proyecto WeatherVar.">
+  <meta name="twitter:image" content="https://www.weathervar.com/assets/img/og-weatherVar.png">
+  <link rel="icon" href="../favicon.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../assets/css/wv-success.css?v=20260715-radar-fuentes-fix">
+  
+</head>
+<body class="page-body">
+  <header class="site-header">
+    <div class="container header-inner">
+      <a class="brand" href="../"><span class="brand-mark" aria-hidden="true"><strong>WV</strong></span><span><strong>WeatherVar</strong><small>Clima de Argentina</small></span></a>
+      <button class="menu-toggle" type="button" aria-expanded="false" aria-controls="main-nav" aria-label="Abrir menú"><span></span><span></span><span></span></button>
+      <nav id="main-nav" class="main-nav static-nav" aria-label="Navegación"><a href="../">Inicio</a><a href="https://mapa.weathervar.com/">Clima Mapa Nacional</a><a href="https://mundo.weathervar.com/">Mundo WeatherVar</a></nav>
+    </div>
+  </header>
+  <main class="container legal-content" style="padding:48px 0 72px;min-height:60vh">
+    <section class="card legal-card">
+      <p class="eyebrow">WeatherVar Argentina</p>
+      <h1>Contacto</h1>
+      
+      <p>Para consultas generales, correcciones o mensajes relacionados con WeatherVar, podés usar el correo de contacto.</p>
+      <p><span id="contact-email" class="contact-email-placeholder">Activá JavaScript para ver el correo de contacto.</span></p>
+      <p class="legal-note">Para emergencias meteorológicas o fenómenos severos, no uses este canal: consultá organismos oficiales y autoridades locales.</p>
+    
+      <p style="margin-top:24px"><a class="button" href="../">Volver al inicio</a></p>
+    </section>
+  </main>
+  <footer class="site-footer"><div class="container footer-inner compact-footer"><p class="footer-credit">WeatherVar es un sitio independiente. Información meteorológica orientativa basada en datos públicos y fuentes oficiales, incluyendo el Servicio Meteorológico Nacional. Ante fenómenos severos, consultá siempre los canales oficiales.</p><nav class="footer-links" aria-label="Páginas legales y fuentes"><a href="../fuentes/">Fuentes</a><a href="../aviso-legal/">Aviso legal</a><a href="../privacidad/">Privacidad</a><a href="../terminos/">Términos</a><a href="../contacto/">Contacto</a></nav><p class="footer-copy">© 2026 WeatherVar. Clima de Argentina.</p></div></footer>
+  <script defer src="../assets/js/wv-ui.js?v=20260715-radar-fuentes-fix"></script>
+  <script>
+(() => {
+  const codes=[116,104,101,119,101,97,116,104,101,114,118,97,114,64,103,109,97,105,108,46,99,111,109];
+  const email=String.fromCharCode(...codes);
+  const target=document.getElementById('contact-email');
+  if(target){ const a=document.createElement('a'); a.className='contact-email-button'; a.href='mailto:'+email; a.textContent='Enviar correo'; target.replaceWith(a); }
+})();
+</script>
+</body>
+</html>

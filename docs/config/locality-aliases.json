@@ -1,0 +1,20 @@
+{
+  "schema_version": 1,
+  "localities": {
+    "4864": {
+      "display_name": "Buenos Aires Ciudad (CABA)",
+      "search_aliases": [
+        "Capital Federal",
+        "CABA",
+        "Ciudad de Buenos Aires",
+        "Ciudad de Buenos Aires CABA",
+        "Ciudad Autónoma de Buenos Aires",
+        "Ciudad Autónoma de Buenos Aires CABA",
+        "Cdad Autónoma de Buenos Aires",
+        "Cdad de Buenos Aires",
+        "Buenos Aires Capital",
+        "Buenos Aires CABA"
+      ]
+    }
+  }
+}
