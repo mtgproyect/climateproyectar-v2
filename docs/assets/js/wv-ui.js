@@ -19,6 +19,9 @@
     let down=false,startX=0,startLeft=0,moved=false;
     scroller.addEventListener("pointerdown",(event)=>{
       if(event.button!==undefined && event.button!==0) return;
+      // No iniciar arrastre sobre controles interactivos. Esto evita que en PC
+      // se bloquee el <details> de "Ver localidades afectadas".
+      if(event.target.closest("summary,details,button,a,select,input,textarea,label")) return;
       down=true;moved=false;startX=event.clientX;startLeft=scroller.scrollLeft;scroller.classList.add("dragging");
       try{ scroller.setPointerCapture(event.pointerId); }catch{}
     });
@@ -38,24 +41,5 @@
     const observer=new MutationObserver(()=>document.querySelectorAll(".forecast-grid,.mini-forecast-grid,#alerts-list,.alert-map-explainer,.source-grid,.metrics-grid").forEach(makeDraggable));
     observer.observe(document.body,{childList:true,subtree:true});
   }
-
-  function installAffectedLocalitiesDetails(){
-    document.addEventListener("click", (event)=>{
-      const summary = event.target.closest(".affected-localities > summary");
-      if(!summary) return;
-      const details = summary.closest(".affected-localities");
-      const card = summary.closest(".alert-record");
-      if(!details) return;
-      event.preventDefault();
-      const willOpen = !details.open;
-      details.open = willOpen;
-      if(card){
-        card.classList.toggle("is-expanded", willOpen);
-        if(willOpen){
-          setTimeout(()=>card.scrollIntoView({block:"nearest", inline:"nearest", behavior:"smooth"}), 30);
-        }
-      }
-    }, true);
-  }
-  ready(()=>{installMenu();installDrag();installAffectedLocalitiesDetails();});
+  ready(()=>{installMenu();installDrag();});
 })();
