@@ -392,3 +392,65 @@ body{font-family:var(--wv-font)!important;}
 .compact-footer .footer-links{
   justify-content:center!important;
 }
+
+
+/* Ajuste 2026-07-15: buscador sobre contenido y anclas sticky */
+.hero,
+.hero-grid,
+.search-card,
+.search-row,
+.search-wrap{
+  overflow:visible!important;
+}
+.hero{
+  position:relative!important;
+  z-index:30000!important;
+}
+.content-wrap{
+  position:relative!important;
+  z-index:1!important;
+}
+.search-card{
+  z-index:30010!important;
+}
+.search-wrap:focus-within{
+  z-index:60010!important;
+}
+.suggestions{
+  z-index:60000!important;
+  max-height:min(55vh,360px)!important;
+  overscroll-behavior:contain!important;
+}
+.site-header{
+  z-index:70000!important;
+}
+.section-nav{
+  top:102px!important;
+}
+.weather-section,
+#tab-summary,
+#tab-forecast,
+#tab-alerts,
+#tab-radar,
+#tab-satellite{
+  scroll-margin-top:190px!important;
+}
+@media (max-width: 760px){
+  .hero{
+    z-index:30000!important;
+  }
+  .suggestions{
+    max-height:min(48vh,330px)!important;
+  }
+  .section-nav{
+    top:64px!important;
+  }
+  .weather-section,
+  #tab-summary,
+  #tab-forecast,
+  #tab-alerts,
+  #tab-radar,
+  #tab-satellite{
+    scroll-margin-top:138px!important;
+  }
+}
