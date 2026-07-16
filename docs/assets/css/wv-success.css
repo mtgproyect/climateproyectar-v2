@@ -455,8 +455,8 @@ body{font-family:var(--wv-font)!important;}
   }
 }
 
-/* Fix final 2026-07-15: bloquear desplazamiento horizontal del documento en móvil
-   Mantiene activos los carruseles internos con overflow-x:auto. */
+/* Fix final: evitar desplazamiento horizontal general del sitio en móvil
+   Conserva el scroll horizontal interno en carruseles y menús. */
 html,
 body {
   width: 100% !important;
@@ -469,37 +469,17 @@ body {
   position: relative !important;
 }
 
-img,
-svg,
-video,
-canvas {
-  max-width: 100%;
-}
-
-.site-header,
-.top-line,
-.header-inner,
-.hero,
-.content-wrap,
-.site-footer,
-.result-shell,
-.location-heading,
-.weather-section,
-.card,
-.search-card,
-.summary-grid,
-.current-card,
-.metrics-grid,
-.alert-layout,
-.viewer-card,
-.radar-viewer-card,
-.satellite-viewer-card {
-  max-width: 100% !important;
+@supports (overflow: clip) {
+  html,
+  body {
+    overflow-x: clip !important;
+  }
 }
 
 @media (max-width: 768px) {
   main,
   .site-header,
+  .hero,
   .content-wrap,
   .site-footer,
   .result-shell,
@@ -557,3 +537,59 @@ canvas {
   }
 }
 
+
+/* Fix Leaflet mapa de alertas · 2026-07-16
+   Restaura el orden interno de capas de Leaflet sin tocar el diseño general. */
+.alert-map,
+.alert-map.leaflet-container {
+  position: relative !important;
+  z-index: 1 !important;
+  overflow: hidden !important;
+  background: #eef8fc !important;
+}
+
+.alert-map .leaflet-map-pane {
+  z-index: 1 !important;
+}
+
+.alert-map .leaflet-tile-pane {
+  z-index: 200 !important;
+}
+
+.alert-map .leaflet-overlay-pane {
+  z-index: 400 !important;
+}
+
+.alert-map .leaflet-shadow-pane {
+  z-index: 500 !important;
+}
+
+.alert-map .leaflet-marker-pane {
+  z-index: 600 !important;
+}
+
+.alert-map .leaflet-tooltip-pane {
+  z-index: 650 !important;
+}
+
+.alert-map .leaflet-popup-pane {
+  z-index: 700 !important;
+}
+
+.alert-map .leaflet-control-container {
+  position: relative !important;
+  z-index: 800 !important;
+}
+
+.alert-map svg,
+.alert-map .leaflet-zoom-animated,
+.alert-map .leaflet-image-layer,
+.alert-map .leaflet-tile,
+.alert-map .leaflet-layer {
+  max-width: none !important;
+  max-height: none !important;
+}
+
+.alert-map path {
+  pointer-events: auto !important;
+}
