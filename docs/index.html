@@ -14,12 +14,12 @@
 <meta charset="utf-8"/>
 <meta content="width=device-width, initial-scale=1, viewport-fit=cover" name="viewport"/>
 <meta content="#071725" name="theme-color"/>
-<meta content="Clima en Argentina por localidad: condiciones actuales, pronóstico extendido, alertas meteorológicas oficiales, radar de lluvia y satélite con datos públicos del SMN." name="description"/>
+<meta content="Consultá el clima en Argentina por localidad. Temperatura actual, pronóstico extendido, alertas meteorológicas, radar de lluvia y satélite con datos públicos del SMN." name="description"/>
 <meta content="light" name="color-scheme"/>
-<meta content="WeatherVar | Clima en Argentina" property="og:title"/>
-<meta content="Clima en Argentina por localidad: condiciones actuales, pronóstico extendido, alertas meteorológicas oficiales, radar de lluvia y satélite con datos públicos del SMN." property="og:description"/>
+<meta content="Clima en Argentina | Pronóstico, alertas y radar | WeatherVar" property="og:title"/>
+<meta content="Consultá el clima en Argentina por localidad. Temperatura actual, pronóstico extendido, alertas meteorológicas, radar de lluvia y satélite con datos públicos del SMN." property="og:description"/>
 <meta content="website" property="og:type"/>
-<title>WeatherVar | Clima en Argentina, pronóstico, alertas, radar y satélite</title>
+<title>Clima en Argentina | Pronóstico del tiempo, alertas y radar | WeatherVar</title>
 <link href="./favicon.svg" rel="icon" type="image/svg+xml"/>
 <link crossorigin="" href="https://data.weathervar.com" rel="preconnect"/>
 <link crossorigin="" href="https://unpkg.com" rel="preconnect"/>
@@ -28,7 +28,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&amp;display=swap" rel="stylesheet"/>
 <link href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" rel="stylesheet"/>
 <link href="./assets/css/styles.css?v=20260704-final" rel="stylesheet"/>
-<link href="./assets/css/wv-success.css?v=20260715-safe-alert-details" rel="stylesheet"/>
+<link href="./assets/css/wv-success.css?v=20260715-mobile-overflow-fix" rel="stylesheet"/>
 <script>
     (() => {
       const DEFAULT_LOCALITY_ID = 4864;
@@ -48,19 +48,49 @@
 <script defer="" src="./assets/js/app.js?v=20260715-safe-alert-details"></script>
 <script defer="" src="./assets/js/final-enhancements.js?v=20260704-final"></script>
 <script defer="" src="./assets/js/wv-ui.js?v=20260715-safe-alert-details"></script>
-<meta content="index,follow,max-image-preview:large" name="robots"/><meta content="WeatherVar" name="author"/><meta content="https://www.weathervar.com/" property="og:url"/><meta content="WeatherVar" property="og:site_name"/><meta content="es_AR" property="og:locale"/><meta content="https://www.weathervar.com/assets/img/og-weatherVar.png" property="og:image"/><meta content="1200" property="og:image:width"/><meta content="630" property="og:image:height"/><meta content="WeatherVar: clima en Argentina, pronóstico, alertas, radar y satélite" property="og:image:alt"/><meta content="summary_large_image" name="twitter:card"/><meta content="WeatherVar | Clima en Argentina" name="twitter:title"/><meta content="Clima en Argentina por localidad: condiciones actuales, pronóstico extendido, alertas meteorológicas oficiales, radar de lluvia y satélite con datos públicos del SMN." name="twitter:description"/><meta content="https://www.weathervar.com/assets/img/og-weatherVar.png" name="twitter:image"/><link href="https://www.weathervar.com/" rel="canonical"/><script type="application/ld+json">{
+<meta content="index,follow,max-image-preview:large" name="robots"/><meta content="WeatherVar" name="author"/><meta content="https://www.weathervar.com/" property="og:url"/><meta content="WeatherVar" property="og:site_name"/><meta content="es_AR" property="og:locale"/><meta content="https://www.weathervar.com/assets/img/og-weatherVar.png" property="og:image"/><meta content="1200" property="og:image:width"/><meta content="630" property="og:image:height"/><meta content="WeatherVar clima en Argentina, pronóstico, alertas y radar" property="og:image:alt"/><meta content="summary_large_image" name="twitter:card"/><meta content="Clima en Argentina | Pronóstico, alertas y radar | WeatherVar" name="twitter:title"/><meta content="Consultá el clima en Argentina por localidad. Temperatura actual, pronóstico extendido, alertas meteorológicas, radar de lluvia y satélite con datos públicos del SMN." name="twitter:description"/><meta content="https://www.weathervar.com/assets/img/og-weatherVar.png" name="twitter:image"/><link href="https://www.weathervar.com/" rel="canonical"/><script type="application/ld+json">{
   "@context": "https://schema.org",
-  "@type": "WebSite",
-  "name": "WeatherVar",
-  "url": "https://www.weathervar.com/",
-  "description": "Clima en Argentina por localidad: condiciones actuales, pronóstico extendido, alertas meteorológicas oficiales, radar de lluvia y satélite.",
-  "inLanguage": "es-AR",
-  "publisher": {
-    "@type": "Organization",
-    "name": "WeatherVar",
-    "url": "https://www.weathervar.com/",
-    "logo": "https://www.weathervar.com/assets/img/og-weatherVar.png"
-  }
+  "@graph": [
+    {
+      "@type": "Organization",
+      "@id": "https://www.weathervar.com/#organization",
+      "name": "WeatherVar",
+      "alternateName": "WeatherVar Argentina",
+      "url": "https://www.weathervar.com/",
+      "logo": {
+        "@type": "ImageObject",
+        "url": "https://www.weathervar.com/assets/img/og-weatherVar.png",
+        "width": 1200,
+        "height": 630
+      }
+    },
+    {
+      "@type": "WebSite",
+      "@id": "https://www.weathervar.com/#website",
+      "name": "WeatherVar",
+      "alternateName": "WeatherVar Argentina",
+      "url": "https://www.weathervar.com/",
+      "description": "Consultá el clima en Argentina por localidad. Temperatura actual, pronóstico extendido, alertas meteorológicas, radar de lluvia y satélite con datos públicos del SMN.",
+      "inLanguage": "es-AR",
+      "publisher": {
+        "@id": "https://www.weathervar.com/#organization"
+      }
+    },
+    {
+      "@type": "WebPage",
+      "@id": "https://www.weathervar.com/#webpage",
+      "url": "https://www.weathervar.com/",
+      "name": "Clima en Argentina | Pronóstico del tiempo, alertas y radar | WeatherVar",
+      "description": "Consultá el clima en Argentina por localidad. Temperatura actual, pronóstico extendido, alertas meteorológicas, radar de lluvia y satélite con datos públicos del SMN.",
+      "isPartOf": {
+        "@id": "https://www.weathervar.com/#website"
+      },
+      "about": {
+        "@id": "https://www.weathervar.com/#organization"
+      },
+      "inLanguage": "es-AR"
+    }
+  ]
 }</script></head>
 <body>
 <a class="skip-link" href="#contenido">Saltar al contenido</a>
@@ -92,7 +122,7 @@
 <div id="recent-searches" hidden aria-hidden="true"><div id="recent-list"></div></div>
 <span id="locality-count" hidden></span>
 
-<section aria-labelledby="hero-title" class="hero"><div class="hero-decoration hero-decoration-one"></div><div class="hero-decoration hero-decoration-two"></div><div class="container hero-grid hero-search-only"><h1 class="sr-only" id="hero-title">Clima en Argentina: pronóstico, alertas, radar y satélite por localidad</h1><div class="search-card">
+<section aria-labelledby="hero-title" class="hero"><div class="hero-decoration hero-decoration-one"></div><div class="hero-decoration hero-decoration-two"></div><div class="container hero-grid hero-search-only"><h1 class="sr-only" id="hero-title">Clima en Argentina con pronóstico del tiempo, alertas, radar y satélite por localidad</h1><div class="search-card">
 <div class="search-card-heading">
 <div>
 <span class="search-kicker">Consulta nacional</span>
