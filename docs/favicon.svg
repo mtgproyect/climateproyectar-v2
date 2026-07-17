@@ -1,14 +1,83 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-labelledby="title desc">
+  <title id="title">Cloud and wave favicon</title>
+  <desc id="desc">Rounded blue gradient square with a white cloud and cyan wave.</desc>
   <defs>
-    <radialGradient id="g" cx="34%" cy="27%" r="78%">
-      <stop offset="0" stop-color="#8ce9f5"/>
-      <stop offset=".42" stop-color="#2aa9cf"/>
-      <stop offset="1" stop-color="#075472"/>
+    <linearGradient id="bg" x1="68" y1="44" x2="468" y2="470" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#020d2e"/>
+      <stop offset="0.34" stop-color="#031c51"/>
+      <stop offset="0.66" stop-color="#0755c6"/>
+      <stop offset="1" stop-color="#08d9ff"/>
+    </linearGradient>
+    <radialGradient id="bgGlow" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="translate(394 388) rotate(-128) scale(275 315)">
+      <stop offset="0" stop-color="#19e9ff" stop-opacity="0.58"/>
+      <stop offset="0.45" stop-color="#0876e7" stop-opacity="0.24"/>
+      <stop offset="1" stop-color="#00143e" stop-opacity="0"/>
     </radialGradient>
+    <linearGradient id="cloud" x1="145" y1="152" x2="382" y2="338" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#ffffff"/>
+      <stop offset="0.72" stop-color="#f7f8fb"/>
+      <stop offset="1" stop-color="#eef1f6"/>
+    </linearGradient>
+    <linearGradient id="crest" x1="102" y1="330" x2="496" y2="300" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#0b2f83"/>
+      <stop offset="0.55" stop-color="#0756bd"/>
+      <stop offset="1" stop-color="#0684e6"/>
+    </linearGradient>
+    <linearGradient id="wave" x1="102" y1="336" x2="490" y2="338" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#26baff"/>
+      <stop offset="0.47" stop-color="#22e4f7"/>
+      <stop offset="0.78" stop-color="#99ffff"/>
+      <stop offset="1" stop-color="#c9ffff"/>
+    </linearGradient>
+    <clipPath id="iconClip">
+      <rect width="512" height="512" rx="116"/>
+    </clipPath>
   </defs>
-  <rect width="64" height="64" rx="17" fill="#04101b"/>
-  <circle cx="32" cy="32" r="23" fill="url(#g)" stroke="#d9f7ff" stroke-width="2"/>
-  <ellipse cx="32" cy="32" rx="15" ry="23" fill="none" stroke="#d9f7ff" stroke-opacity=".55" stroke-width="1.5"/>
-  <path d="M9 32h46M13 22h38M13 42h38" fill="none" stroke="#d9f7ff" stroke-opacity=".55" stroke-width="1.5"/>
-  <text x="32" y="37" text-anchor="middle" font-family="system-ui,sans-serif" font-size="13" font-weight="800" fill="#fff">CP</text>
+
+  <g clip-path="url(#iconClip)">
+    <rect width="512" height="512" rx="116" fill="url(#bg)"/>
+    <rect width="512" height="512" rx="116" fill="url(#bgGlow)"/>
+
+    <!-- Cloud -->
+    <path fill="url(#cloud)" d="
+      M 89 325
+      C 68 307, 67 276, 79 249
+      C 91 221, 119 201, 149 201
+      C 157 201, 165 202, 173 205
+      C 181 159, 219 127, 266 127
+      C 314 127, 353 161, 360 208
+      C 370 205, 380 203, 391 203
+      C 430 203, 462 235, 462 275
+      C 462 288, 459 300, 453 311
+      C 448 294, 438 281, 423 274
+      C 395 261, 368 265, 342 278
+      C 315 291, 288 314, 258 331
+      C 225 350, 191 360, 157 357
+      C 128 355, 104 344, 89 325 Z"/>
+
+    <!-- Dark upper edge of the wave -->
+    <path fill="url(#crest)" d="
+      M 99 330
+      C 143 370, 202 372, 258 343
+      C 292 326, 324 301, 354 282
+      C 391 258, 426 255, 453 266
+      C 478 276, 493 294, 499 314
+      C 483 294, 461 285, 438 286
+      C 407 287, 379 305, 348 327
+      C 314 351, 279 373, 239 382
+      C 181 396, 130 376, 99 330 Z"/>
+
+    <!-- Cyan wave -->
+    <path fill="url(#wave)" d="
+      M 101 335
+      C 144 379, 202 388, 263 359
+      C 300 341, 333 312, 365 294
+      C 393 278, 421 276, 445 286
+      C 470 297, 486 314, 493 335
+      C 479 320, 461 312, 445 313
+      C 420 315, 400 333, 378 354
+      C 346 385, 310 407, 269 413
+      C 207 421, 143 389, 101 335 Z"/>
+  </g>
 </svg>
