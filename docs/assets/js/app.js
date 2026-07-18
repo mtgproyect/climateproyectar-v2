@@ -9,7 +9,7 @@
   const AUTO_REFRESH_MS = 5 * 60 * 1000;
   const SOURCE_AGE_TICK_MS = 60 * 1000;
   const DEFAULT_LOCALITY_ID = 4864;
-  const AUTO_IP_LOCATION_ENABLED = true;
+  const AUTO_IP_LOCATION_ENABLED = false;
   const AUTO_IP_LOCATION_URL = "https://ipapi.co/json/";
   const AUTO_IP_LOCATION_TIMEOUT_MS = 1400;
 
@@ -1411,34 +1411,33 @@
 
   async function chooseInitialLocality() {
     const requestedId = validLocalityId(new URL(window.location.href).searchParams.get("id"));
+
     if (requestedId) {
-      selectLocality(requestedId, { skipUrl: true, instant: true });
-      cleanCurrentUrlForDefaultLocality(requestedId);
+      selectLocality(requestedId, {
+        skipUrl: true,
+        instant: true,
+        saveRecent: false,
+      });
       return;
     }
 
-    const recentId = getRecentIds().map(validLocalityId).find(Boolean);
-    if (recentId) {
-      selectLocality(recentId, { skipUrl: true, instant: true, saveRecent: false });
-      cleanCurrentUrlForDefaultLocality(recentId);
-      elements.searchStatus.textContent = `${elements.searchStatus.textContent} · Localidad reciente.`;
-      return;
-    }
+    const fallbackId =
+      validLocalityId(DEFAULT_LOCALITY_ID) ||
+      validLocalityId(4864) ||
+      Number(state.rows[0]?.[COL.id]);
 
-    const ipRow = await localityFromApproximateIp();
-    if (ipRow) {
-      selectLocality(Number(ipRow[COL.id]), { skipUrl: true, instant: true, saveRecent: false });
-      cleanCurrentUrlForDefaultLocality(ipRow[COL.id]);
-      elements.searchStatus.textContent = `${localityLabel(ipRow)} · Ubicación aproximada por red.`;
-      return;
-    }
-
-    const fallbackId = validLocalityId(DEFAULT_LOCALITY_ID) || validLocalityId(4864) || Number(state.rows[0]?.[COL.id]);
     if (fallbackId) {
       const row = state.rowsById.get(fallbackId);
-      selectLocality(fallbackId, { skipUrl: true, instant: true, saveRecent: false });
-      cleanCurrentUrlForDefaultLocality(fallbackId);
-      if (row) elements.searchStatus.textContent = `${localityLabel(row)} · Localidad inicial predeterminada.`;
+      selectLocality(fallbackId, {
+        skipUrl: true,
+        instant: true,
+        saveRecent: false,
+      });
+
+      if (row) {
+        elements.searchStatus.textContent =
+          `${localityLabel(row)} · Localidad inicial predeterminada.`;
+      }
     }
   }
 
