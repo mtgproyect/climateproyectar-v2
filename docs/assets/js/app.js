@@ -1268,7 +1268,7 @@
     elements.errorState.hidden = true;
     elements.resultSection.hidden = false;
     elements.locationTitle.textContent = displayName(row);
-    document.title = `${displayName(row)} | ClimateProyectar`;
+    document.title = "Pronóstico del tiempo en Argentina | WeatherVar";
     elements.locationSubtitle.textContent = [row[COL.type], row[COL.department], row[COL.province]].filter(Boolean).join(" · ");
     if (!options.skipUrl) setUrl(Number(id));
     if (options.saveRecent !== false) saveRecent(Number(id));
@@ -1445,7 +1445,7 @@
   async function shareCurrent() {
     const row = state.rowsById.get(state.selectedId);
     if (!row) return;
-    const data = { title: `Clima en ${displayName(row)}`, text: `Consultá el clima de ${displayName(row)} en ClimateProyectar.`, url: window.location.href };
+    const data = { title: `Clima en ${displayName(row)}`, text: `Consultá el clima de ${displayName(row)} en WeatherVar.`, url: window.location.href };
     try {
       if (navigator.share) await navigator.share(data);
       else {
