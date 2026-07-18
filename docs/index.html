@@ -29,23 +29,9 @@
 <link href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" rel="stylesheet"/>
 <link href="./assets/css/styles.css?v=20260704-final" rel="stylesheet"/>
 <link href="./assets/css/wv-success.css?v=20260716-alert-map-layer-fix" rel="stylesheet"/>
-<script>
-    (() => {
-      const DEFAULT_LOCALITY_ID = 4864;
-      const url = new URL(window.location.href);
-      if (!url.searchParams.has("id")) {
-        url.searchParams.set("id", String(DEFAULT_LOCALITY_ID));
-        history.replaceState(
-          { localityId: DEFAULT_LOCALITY_ID },
-          "",
-          url
-        );
-      }
-    })();
-  </script>
 <script defer="" src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script defer="" src="./assets/js/date-utils.js"></script>
-<script defer="" src="./assets/js/app.js?v=20260715-safe-alert-details"></script>
+<script defer="" src="./assets/js/app.js?v=20260718-clean-start"></script>
 <script defer="" src="./assets/js/final-enhancements.js?v=20260704-final"></script>
 <script defer="" src="./assets/js/wv-ui.js?v=20260715-safe-alert-details"></script>
 <meta content="index,follow,max-image-preview:large" name="robots"/><meta content="WeatherVar" name="author"/><meta content="https://www.weathervar.com/" property="og:url"/><meta content="WeatherVar" property="og:site_name"/><meta content="es_AR" property="og:locale"/><meta content="https://www.weathervar.com/assets/img/og-weatherVar.png" property="og:image"/><meta content="https://www.weathervar.com/assets/img/og-weatherVar.png" property="og:image:secure_url"/><meta content="image/png" property="og:image:type"/><meta content="1254" property="og:image:width"/><meta content="1254" property="og:image:height"/><meta content="WeatherVar: clima en Argentina, pronóstico, alertas, radar y satélite" property="og:image:alt"/><meta content="summary" name="twitter:card"/><meta content="Pronóstico del tiempo en Argentina | WeatherVar" name="twitter:title"/><meta content="Consultá ahora el pronóstico del tiempo en Argentina por localidad: temperatura actual, próximos días, alertas oficiales, radar de lluvia y satélite." name="twitter:description"/><meta content="https://www.weathervar.com/assets/img/og-weatherVar.png" name="twitter:image"/><meta content="WeatherVar: clima en Argentina, pronóstico, alertas, radar y satélite" name="twitter:image:alt"/><link href="https://www.weathervar.com/" rel="canonical"/><script type="application/ld+json">{
