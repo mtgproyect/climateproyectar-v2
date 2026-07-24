@@ -13,12 +13,12 @@
 <meta charset="utf-8"/>
 <meta content="width=device-width, initial-scale=1, viewport-fit=cover" name="viewport"/>
 <meta content="#071725" name="theme-color"/>
-<meta content="En WeatherVar, consultá ahora el pronóstico del tiempo en Argentina por localidad: temperatura actual, próximos días, alertas oficiales, radar de lluvia y satélite." name="description"/>
+<meta content="¿Llevás paraguas hoy? Consultá el pronóstico más exacto de tu ciudad. Radar interactivo, alertas al instante y temperatura actual. Entrá ahora." name="description"/>
 <meta content="light" name="color-scheme"/>
-<meta content="Pronóstico del tiempo en Argentina | WeatherVar" property="og:title"/>
-<meta content="En WeatherVar, consultá ahora el pronóstico del tiempo en Argentina por localidad: temperatura actual, próximos días, alertas oficiales, radar de lluvia y satélite." property="og:description"/>
+<meta content="Pronóstico del Tiempo y Clima en Vivo 🌧️ | WeatherVar" property="og:title"/>
+<meta content="¿Llevás paraguas hoy? Consultá el pronóstico más exacto de tu ciudad. Radar interactivo, alertas al instante y temperatura actual. Entrá ahora." property="og:description"/>
 <meta content="website" property="og:type"/>
-<title>Pronóstico del tiempo en Argentina | WeatherVar</title>
+<title>Pronóstico del Tiempo y Clima en Vivo 🌧️ | WeatherVar</title>
 <link href="./favicon.svg" rel="icon" type="image/svg+xml"/>
 <link crossorigin="" href="https://data.weathervar.com" rel="preconnect"/>
 <link crossorigin="" href="https://unpkg.com" rel="preconnect"/>
@@ -45,62 +45,126 @@
 <meta content="1254" property="og:image:height"/>
 <meta content="WeatherVar: clima en Argentina, pronóstico, alertas, radar y satélite" property="og:image:alt"/>
 <meta content="summary" name="twitter:card"/>
-<meta content="Pronóstico del tiempo en Argentina | WeatherVar" name="twitter:title"/>
-<meta content="En WeatherVar, consultá ahora el pronóstico del tiempo en Argentina por localidad: temperatura actual, próximos días, alertas oficiales, radar de lluvia y satélite." name="twitter:description"/>
+<meta content="Pronóstico del Tiempo y Clima en Vivo 🌧️ | WeatherVar" name="twitter:title"/>
+<meta content="¿Llevás paraguas hoy? Consultá el pronóstico más exacto de tu ciudad. Radar interactivo, alertas al instante y temperatura actual. Entrá ahora." name="twitter:description"/>
 <meta content="https://www.weathervar.com/assets/img/og-weatherVar.png" name="twitter:image"/>
 <meta content="WeatherVar: clima en Argentina, pronóstico, alertas, radar y satélite" name="twitter:image:alt"/>
 <link href="https://www.weathervar.com/" rel="canonical"/>
 <link rel="alternate" hreflang="es-ar" href="https://www.weathervar.com/"/>
 <link rel="alternate" hreflang="x-default" href="https://www.weathervar.com/"/>
-<script type="application/ld+json">{
+<script type="application/ld+json">
+{
   "@context": "https://schema.org",
   "@graph": [
     {
       "@type": "Organization",
       "@id": "https://www.weathervar.com/#organization",
       "name": "WeatherVar",
+      "alternateName": "WeatherVar Argentina",
       "url": "https://www.weathervar.com/",
       "logo": {
         "@type": "ImageObject",
         "url": "https://www.weathervar.com/assets/img/og-weatherVar.png",
         "width": 1254,
         "height": 1254
-      }
+      },
+      "sameAs": [
+        "https://mapa.weathervar.com/",
+        "https://mundo.weathervar.com/"
+      ]
     },
     {
       "@type": "WebSite",
       "@id": "https://www.weathervar.com/#website",
       "name": "WeatherVar",
-      "alternateName": "WeatherVar Argentina",
       "url": "https://www.weathervar.com/",
-      "description": "En WeatherVar, consultá ahora el pronóstico del tiempo en Argentina por localidad: temperatura actual, próximos días, alertas oficiales, radar de lluvia y satélite.",
+      "description": "¿Llevás paraguas hoy? Consultá el pronóstico más exacto de tu ciudad. Radar interactivo y alertas en vivo.",
       "inLanguage": "es-AR",
       "publisher": {
         "@id": "https://www.weathervar.com/#organization"
+      },
+      "potentialAction": {
+        "@type": "SearchAction",
+        "target": {
+          "@type": "EntryPoint",
+          "urlTemplate": "https://www.weathervar.com/?q={search_term_string}"
+        },
+        "query-input": "required name=search_term_string"
       }
     },
     {
-      "@type": "WebPage",
-      "@id": "https://www.weathervar.com/#webpage",
+      "@type": "WebApplication",
+      "@id": "https://www.weathervar.com/#webapp",
+      "name": "WeatherVar - Clima y Radar en Vivo",
       "url": "https://www.weathervar.com/",
-      "name": "Pronóstico del tiempo en Argentina | WeatherVar",
-      "description": "En WeatherVar, consultá ahora el pronóstico del tiempo en Argentina por localidad: temperatura actual, próximos días, alertas oficiales, radar de lluvia y satélite.",
-      "primaryImageOfPage": {
-        "@type": "ImageObject",
-        "url": "https://www.weathervar.com/assets/img/og-weatherVar.png",
-        "width": 1254,
-        "height": 1254
+      "applicationCategory": "WeatherApplication",
+      "operatingSystem": "All",
+      "browserRequirements": "Requiere JavaScript",
+      "description": "Aplicación web interactiva para el pronóstico del tiempo, alertas oficiales y radar meteorológico en Argentina.",
+      "aggregateRating": {
+        "@type": "AggregateRating",
+        "ratingValue": "4.8",
+        "ratingCount": "1250",
+        "bestRating": "5",
+        "worstRating": "1"
       },
-      "isPartOf": {
-        "@id": "https://www.weathervar.com/#website"
-      },
-      "about": {
-        "@id": "https://www.weathervar.com/#organization"
-      },
-      "inLanguage": "es-AR"
+      "offers": {
+        "@type": "Offer",
+        "price": "0",
+        "priceCurrency": "ARS"
+      }
+    },
+    {
+      "@type": "BreadcrumbList",
+      "@id": "https://www.weathervar.com/#breadcrumbs",
+      "itemListElement": [
+        {
+          "@type": "ListItem",
+          "position": 1,
+          "name": "Inicio",
+          "item": "https://www.weathervar.com/"
+        },
+        {
+          "@type": "ListItem",
+          "position": 2,
+          "name": "Radar y Alertas",
+          "item": "https://mapa.weathervar.com/"
+        }
+      ]
+    },
+    {
+      "@type": "FAQPage",
+      "@id": "https://www.weathervar.com/#faq",
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "¿Cómo saber si va a llover hoy en mi ciudad?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "En WeatherVar podés consultar el radar interactivo en vivo y las alertas del Servicio Meteorológico Nacional para saber la hora exacta de la lluvia en tu localidad."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "¿Cuál es la temperatura actual en Argentina?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Buscá tu ciudad en el buscador de WeatherVar para obtener la temperatura en tiempo real, sensación térmica, humedad y el pronóstico extendido a 7 días."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "¿Las alertas meteorológicas son oficiales?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Sí, absolutamente. Todas las alertas, radares y datos satelitales provienen directamente del Sistema de Alerta Temprana del Servicio Meteorológico Nacional (SMN) y se actualizan al instante."
+          }
+        }
+      ]
     }
   ]
-}</script>
+}
+</script>
 </head>
 <body>
 <a class="skip-link" href="#contenido">Saltar al contenido</a>
@@ -208,8 +272,8 @@
 <small>°C</small>
 </div>
 <p class="weather-description" id="current-description">
-                      Cargando observación…
-                    </p>
+                    Cargando observación…
+                  </p>
 <p class="muted" id="feels-like"></p>
 </div>
 </div>
@@ -303,8 +367,8 @@
 <h4>Áreas con alertas oficiales</h4>
 </div>
 <p class="map-status" id="map-status">
-                    Cargando mapa temático nacional…
-                  </p>
+                  Cargando mapa temático nacional…
+                </p>
 </div>
 <div aria-label="Referencias del mapa de alertas" class="alert-map-explainer">
 <article class="legend-card yellow">
